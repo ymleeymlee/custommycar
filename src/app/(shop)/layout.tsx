@@ -1,4 +1,5 @@
 import Header from '@/components/Header'
+import KakaoChat from '@/components/KakaoChat'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -17,6 +18,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
     <>
       <Header profile={profile} />
       <main className="flex-1">{children}</main>
+      <KakaoChat />
     </>
   )
 }
