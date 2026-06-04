@@ -16,6 +16,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
   const [searchQuery, setSearchQuery] = useState('')
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedId, setAddedId] = useState<string | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const loadCart = useCallback(async () => {
     const res = await fetch('/api/cart')
@@ -60,8 +61,8 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
 
   return (
     <div className="flex min-h-screen bg-[#f0f2f5]">
-      {/* 사이드바 */}
-      <aside className="w-60 flex-shrink-0 bg-white border-r border-gray-200/80 pt-5 flex flex-col">
+      {/* 사이드바 — 데스크탑 */}
+      <aside className="hidden md:flex w-60 flex-shrink-0 bg-white border-r border-gray-200/80 pt-5 flex-col">
         <div className="px-5 pb-3">
           <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">카테고리</h2>
         </div>
@@ -91,23 +92,69 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
         </div>
       </aside>
 
-      {/* 메인 */}
-      <div className="flex-1 p-6">
-        {/* 검색 + 헤더 */}
-        <div className="flex items-center justify-between mb-5 gap-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-gray-900">{selectedCategory}</h2>
-            <span className="text-sm text-gray-400">— {filteredProducts.length}개 제품</span>
+      {/* 모바일 카테고리 드로어 */}
+      {sidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-40" onClick={() => setSidebarOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-xl pt-5" onClick={e => e.stopPropagation()}>
+            <div className="px-5 pb-3 flex items-center justify-between">
+              <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">카테고리</h2>
+              <button onClick={() => setSidebarOpen(false)} className="text-gray-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => { setSelectedCategory(cat); setSidebarOpen(false) }}
+                className={`w-full text-left px-5 py-3 text-sm flex items-center justify-between ${
+                  selectedCategory === cat ? 'bg-[#1a2744] text-white font-semibold' : 'text-gray-600'
+                }`}
+              >
+                <span>{cat}</span>
+                <span className={`text-xs font-medium rounded-full px-2 py-0.5 ${
+                  selectedCategory === cat ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                }`}>
+                  {cat === '전체' ? products.length : (categoryCounts[cat] || 0)}
+                </span>
+              </button>
+            ))}
           </div>
-          <div className="relative w-72">
+        </div>
+      )}
+
+      {/* 메인 */}
+      <div className="flex-1 p-4 md:p-6 min-w-0">
+        {/* 검색 + 헤더 */}
+        <div className="flex items-center justify-between mb-4 gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* 모바일 카테고리 버튼 */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-xl shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h8m-8 6h16" />
+              </svg>
+              {selectedCategory}
+            </button>
+            <span className="hidden md:flex items-center gap-2">
+              <h2 className="text-base font-bold text-gray-900">{selectedCategory}</h2>
+              <span className="text-sm text-gray-400">— {filteredProducts.length}개 제품</span>
+            </span>
+            <span className="md:hidden text-xs text-gray-400">{filteredProducts.length}개</span>
+          </div>
+          <div className="relative flex-1 max-w-xs">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="제품명, SKU 검색..."
-              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2744]/30 focus:border-[#1a2744] shadow-sm transition-all"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2744]/30 focus:border-[#1a2744] shadow-sm transition-all"
             />
-            <svg className="absolute left-3 top-3 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -118,14 +165,14 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
             검색 결과가 없습니다.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
             {filteredProducts.map(product => (
               <div
                 key={product.id}
                 className="bg-white border border-gray-200/80 rounded-2xl hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden group"
               >
                 {/* 이미지 영역 */}
-                <div className="h-44 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+                <div className="h-32 md:h-44 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <svg className="w-14 h-14 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
