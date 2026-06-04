@@ -99,59 +99,53 @@ export default function CartPage() {
           {/* 장바구니 항목 */}
           <div className="flex-1 space-y-3">
             {items.map(item => (
-              <div
-                key={item.id}
-                className="bg-white border border-gray-200/80 rounded-2xl p-4 flex gap-4 shadow-sm"
-              >
-                {/* 이미지 */}
-                <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex-shrink-0 border border-gray-100 relative overflow-hidden flex items-center justify-center">
-                  {item.product.image_url ? (
-                    <Image src={item.product.image_url} alt={item.product.name} fill className="object-contain p-1.5" />
-                  ) : (
-                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  )}
-                </div>
-
-                {/* 정보 */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-gray-400 font-mono">{item.product.sku}</span>
-                    <span className="text-xs font-semibold text-[#c41230]">{item.product.brand}</span>
+              <div key={item.id} className="bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm">
+                {/* 상단: 이미지 + 정보 + 삭제 */}
+                <div className="flex gap-3">
+                  {/* 이미지 */}
+                  <div className="w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex-shrink-0 border border-gray-100 relative overflow-hidden flex items-center justify-center">
+                    {item.product.image_url ? (
+                      <Image src={item.product.image_url} alt={item.product.name} fill className="object-contain p-1.5" />
+                    ) : (
+                      <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    )}
                   </div>
-                  <div className="text-sm font-bold text-gray-900 leading-snug">{item.product.name}</div>
-                  {item.product.description && (
-                    <div className="text-xs text-gray-500 mt-1 line-clamp-1 hidden sm:block">{item.product.description}</div>
-                  )}
-                  <div className="mt-1.5 text-sm font-black text-gray-900">
-                    {formatPrice(item.product.price * item.quantity)}
-                    <span className="text-xs font-normal text-gray-400 ml-1.5">{formatPrice(item.product.price)} × {item.quantity}</span>
-                  </div>
-                </div>
 
-                {/* 수량 + 삭제 */}
-                <div className="flex flex-col items-end justify-between gap-2">
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
-                  >
+                  {/* 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-[10px] font-mono text-gray-400">{item.product.sku}</span>
+                      <p className="text-xs font-semibold text-[#c41230]">{item.product.brand}</p>
+                    </div>
+                    <p className="text-sm font-bold text-gray-900 leading-snug mb-1">{item.product.name}</p>
+                    {item.product.description && (
+                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{item.product.description}</p>
+                    )}
+                  </div>
+
+                  {/* 삭제 */}
+                  <button onClick={() => removeItem(item.id)}
+                    className="w-7 h-7 flex-shrink-0 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                  <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      disabled={item.quantity <= 1}
-                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors text-lg leading-none"
-                    >−</button>
-                    <span className="w-9 text-center text-sm font-bold text-gray-900">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      disabled={item.quantity >= item.product.stock}
-                      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-30 transition-colors text-lg leading-none"
-                    >+</button>
+                </div>
+
+                {/* 하단: 가격 + 수량 */}
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                  <div>
+                    <span className="text-sm font-black text-gray-900">{formatPrice(item.product.price * item.quantity)}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">{formatPrice(item.product.price)} × {item.quantity}</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-gray-900 rounded-full px-1 py-1 shadow-sm">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}
+                      className="w-7 h-7 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors text-base font-bold disabled:opacity-30">−</button>
+                    <span className="w-6 text-center text-xs font-black text-white">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={item.quantity >= item.product.stock}
+                      className="w-7 h-7 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors text-base font-bold disabled:opacity-30">+</button>
                   </div>
                 </div>
               </div>
