@@ -12,7 +12,6 @@ export default function CartPage() {
   const router = useRouter()
   const { items, setItems, totalPrice } = useCartStore()
   const [loading, setLoading] = useState(true)
-  const [updatingId, setUpdatingId] = useState<string | null>(null)
 
   const loadCart = useCallback(async () => {
     const res = await fetch('/api/cart')
@@ -25,31 +24,32 @@ export default function CartPage() {
 
   useEffect(() => { loadCart() }, [loadCart])
 
-  const updateQuantity = async (itemId: string, newQty: number) => {
-    setUpdatingId(itemId)
-    const res = await fetch('/api/cart', {
+  const updateQuantity = (itemId: string, newQty: number) => {
+    if (newQty < 1) return
+    // 즉시 UI 반영
+    setItems(items.map(i => i.id === itemId ? { ...i, quantity: newQty } : i))
+    // 백그라운드 동기화
+    fetch('/api/cart', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: itemId, quantity: newQty }),
     })
-    if (res.ok) setItems(await res.json())
-    setUpdatingId(null)
   }
 
-  const removeItem = async (itemId: string) => {
-    setUpdatingId(itemId)
-    const res = await fetch('/api/cart', {
+  const removeItem = (itemId: string) => {
+    // 즉시 UI 반영
+    setItems(items.filter(i => i.id !== itemId))
+    // 백그라운드 동기화
+    fetch('/api/cart', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: itemId }),
     })
-    if (res.ok) setItems(await res.json())
-    setUpdatingId(null)
   }
 
-  const clearCart = async () => {
-    const res = await fetch('/api/cart', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
-    if (res.ok) setItems([])
+  const clearCart = () => {
+    setItems([])
+    fetch('/api/cart', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
   }
 
   if (loading) {
@@ -102,7 +102,7 @@ export default function CartPage() {
             {items.map(item => (
               <div
                 key={item.id}
-                className={`bg-white border border-gray-200/80 rounded-2xl p-4 flex gap-4 shadow-sm transition-opacity ${updatingId === item.id ? 'opacity-40 pointer-events-none' : ''}`}
+                className="bg-white border border-gray-200/80 rounded-2xl p-4 flex gap-4 shadow-sm"
               >
                 {/* 이미지 */}
                 <div className="w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100">
