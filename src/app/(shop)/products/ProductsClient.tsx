@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cartStore'
 import { Product, CartItem } from '@/types'
 
@@ -158,13 +159,17 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
           <div className="space-y-3">
             {filteredProducts.map(product => (
               <div key={product.id}
-                className="bg-white border border-gray-200/80 rounded-2xl hover:shadow-md transition-all duration-150 flex gap-4 p-4 items-center"
+                className="bg-transparent hover:bg-white/60 border border-gray-200/60 rounded-2xl hover:shadow-md transition-all duration-150 flex gap-4 p-4 items-center"
               >
                 {/* 이미지 */}
-                <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center border border-gray-100 relative overflow-hidden">
-                  <svg className="w-9 h-9 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-                  </svg>
+                <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-100 relative overflow-hidden flex items-center justify-center">
+                  {product.image_url ? (
+                    <Image src={product.image_url} alt={product.name} fill className="object-contain p-1.5" />
+                  ) : (
+                    <svg className="w-9 h-9 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  )}
                   {product.stock === 0 && (
                     <div className="absolute inset-0 bg-gray-900/30 flex items-center justify-center">
                       <span className="text-white text-[10px] font-bold">품절</span>
@@ -189,19 +194,29 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
                 {/* 가격 + 버튼 */}
                 <div className="flex-shrink-0 flex flex-col items-end gap-2">
                   <div className="text-base md:text-lg font-black text-gray-900">{formatPrice(product.price)}</div>
-                  <button
-                    onClick={() => addToCart(product)}
-                    disabled={product.stock === 0}
-                    className={`whitespace-nowrap text-xs font-bold px-3 py-2 md:px-4 md:py-2.5 rounded-xl transition-all ${
-                      addedId === product.id
-                        ? 'bg-emerald-500 text-white'
-                        : product.stock === 0
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-[#c41230] hover:bg-[#a50e28] text-white shadow-sm'
-                    }`}
-                  >
-                    {addedId === product.id ? '✓ 담김' : product.stock === 0 ? '품절' : '담기'}
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => addToCart(product)}
+                      disabled={product.stock === 0}
+                      className={`whitespace-nowrap text-xs font-bold px-4 py-2 rounded-full transition-all ${
+                        addedId === product.id
+                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-95'
+                          : product.stock === 0
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-gray-900 hover:bg-gray-700 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0'
+                      }`}
+                    >
+                      {addedId === product.id ? '✓ 담김' : product.stock === 0 ? '품절' : '담기'}
+                    </button>
+                    {(() => {
+                      const count = items.find(i => i.product_id === product.id)?.quantity
+                      return count ? (
+                        <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                          {count > 9 ? '9+' : count}
+                        </span>
+                      ) : null
+                    })()}
+                  </div>
                 </div>
               </div>
             ))}

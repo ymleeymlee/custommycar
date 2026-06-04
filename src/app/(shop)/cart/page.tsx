@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cartStore'
@@ -11,18 +12,16 @@ const formatPrice = (price: number) => new Intl.NumberFormat('ko-KR').format(pri
 export default function CartPage() {
   const router = useRouter()
   const { items, setItems, totalPrice } = useCartStore()
-  const [loading, setLoading] = useState(true)
+  // zustand에 데이터 있으면 로딩 없이 즉시 표시
+  const [loading, setLoading] = useState(items.length === 0)
 
-  const loadCart = useCallback(async () => {
-    const res = await fetch('/api/cart')
-    if (res.ok) {
-      const data = await res.json()
-      setItems(data as CartItem[])
-    }
-    setLoading(false)
+  useEffect(() => {
+    // 백그라운드에서 최신 데이터 동기화
+    fetch('/api/cart')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setItems(data as CartItem[]) })
+      .finally(() => setLoading(false))
   }, [setItems])
-
-  useEffect(() => { loadCart() }, [loadCart])
 
   const updateQuantity = (itemId: string, newQty: number) => {
     if (newQty < 1) return
@@ -105,10 +104,14 @@ export default function CartPage() {
                 className="bg-white border border-gray-200/80 rounded-2xl p-4 flex gap-4 shadow-sm"
               >
                 {/* 이미지 */}
-                <div className="w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100">
-                  <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-                  </svg>
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex-shrink-0 border border-gray-100 relative overflow-hidden flex items-center justify-center">
+                  {item.product.image_url ? (
+                    <Image src={item.product.image_url} alt={item.product.name} fill className="object-contain p-1.5" />
+                  ) : (
+                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  )}
                 </div>
 
                 {/* 정보 */}
@@ -118,7 +121,10 @@ export default function CartPage() {
                     <span className="text-xs font-semibold text-[#c41230]">{item.product.brand}</span>
                   </div>
                   <div className="text-sm font-bold text-gray-900 leading-snug">{item.product.name}</div>
-                  <div className="mt-2 text-sm font-black text-gray-900">
+                  {item.product.description && (
+                    <div className="text-xs text-gray-500 mt-1 line-clamp-1 hidden sm:block">{item.product.description}</div>
+                  )}
+                  <div className="mt-1.5 text-sm font-black text-gray-900">
                     {formatPrice(item.product.price * item.quantity)}
                     <span className="text-xs font-normal text-gray-400 ml-1.5">{formatPrice(item.product.price)} × {item.quantity}</span>
                   </div>
@@ -176,12 +182,12 @@ export default function CartPage() {
 
               <button
                 onClick={() => router.push('/checkout')}
-                className="w-full bg-[#c41230] hover:bg-[#a50e28] text-white font-bold py-3 rounded-xl transition-all shadow-sm hover:shadow-md"
+                className="btn-danger w-full"
               >
-                결제하기
+                결제하기 →
               </button>
-              <Link href="/products" className="block text-center text-sm text-gray-400 hover:text-gray-600 mt-3 transition-colors">
-                쇼핑 계속하기
+              <Link href="/products" className="btn-outline w-full mt-3 justify-center">
+                ← 쇼핑 계속하기
               </Link>
             </div>
           </div>

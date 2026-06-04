@@ -107,16 +107,10 @@ function SuccessContent() {
         )}
 
         <div className="flex gap-3">
-          <Link
-            href="/orders"
-            className="flex-1 bg-[#1a2744] hover:bg-[#243560] text-white font-bold py-3 rounded-xl text-sm transition-colors"
-          >
+          <Link href="/orders" className="btn-primary flex-1 justify-center py-3">
             배송 현황 보기
           </Link>
-          <Link
-            href="/products"
-            className="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors"
-          >
+          <Link href="/products" className="btn-outline flex-1 justify-center py-3">
             계속 쇼핑하기
           </Link>
         </div>

@@ -25,7 +25,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { items, setItems, totalPrice } = useCartStore()
   const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!profile)
   const [processing, setProcessing] = useState(false)
   const detailRef = useRef<HTMLInputElement>(null)
   const [shippingForm, setShippingForm] = useState({
@@ -37,19 +37,13 @@ export default function CheckoutPage() {
   })
 
   const loadData = useCallback(async () => {
-    const [profileRes, cartRes] = await Promise.all([
-      fetch('/api/profile'),
-      fetch('/api/cart'),
-    ])
-
+    // profile만 fetch (cart는 zustand에서 즉시 사용)
+    const profileRes = await fetch('/api/profile')
     if (!profileRes.ok) { router.push('/login'); return }
 
     const profileData: Profile = await profileRes.json()
-    const cartData: CartItem[] = await cartRes.json()
-
     setProfile(profileData)
 
-    // localStorage에서 저장된 주소 복원, 없으면 프로필 기본값 사용
     const savedAddress = JSON.parse(localStorage.getItem('cmc_shipping') || 'null')
     setShippingForm({
       name: profileData.company_name || '',
@@ -59,8 +53,12 @@ export default function CheckoutPage() {
       zipcode: savedAddress?.zipcode || '',
     })
 
-    setItems(cartData)
     setLoading(false)
+
+    // 백그라운드에서 cart 동기화
+    fetch('/api/cart')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setItems(data as CartItem[]) })
   }, [router, setItems])
 
   const openAddressSearch = () => {
@@ -294,11 +292,11 @@ export default function CheckoutPage() {
             </div>
 
             {/* 결제 수단 */}
-            <div className="mb-4 p-3 bg-gray-50 rounded text-xs text-gray-600">
-              <div className="font-semibold mb-1">결제 수단</div>
-              <div className="flex flex-wrap gap-1">
+            <div className="mb-4 p-3 bg-gray-50 rounded-xl text-xs text-gray-600">
+              <div className="font-semibold mb-2 text-gray-700">결제 수단</div>
+              <div className="flex flex-wrap gap-1.5">
                 {['신용카드', '체크카드', '카카오페이', '네이버페이', '토스'].map(m => (
-                  <span key={m} className="bg-white border border-gray-200 px-2 py-0.5 rounded">{m}</span>
+                  <span key={m} className="bg-white border border-gray-200 px-2.5 py-1 rounded-lg font-medium text-gray-600">{m}</span>
                 ))}
               </div>
             </div>
@@ -306,14 +304,22 @@ export default function CheckoutPage() {
             <button
               onClick={handlePayment}
               disabled={processing || items.length === 0}
-              className="w-full bg-[#c41230] hover:bg-[#a50e28] disabled:bg-gray-300 text-white font-bold py-3 rounded transition-colors"
+              className="btn-danger w-full py-4 disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
             >
-              {processing ? '결제 처리 중...' : `${formatPrice(totalPrice())} 결제하기`}
+              {processing ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  결제 처리 중...
+                </span>
+              ) : `${formatPrice(totalPrice())} 결제하기`}
             </button>
 
             <button
               onClick={() => router.push('/cart')}
-              className="w-full text-sm text-gray-500 hover:text-gray-700 mt-3 py-1"
+              className="w-full text-sm text-gray-400 hover:text-gray-700 mt-3 py-2 font-medium transition-colors"
             >
               ← 장바구니로 돌아가기
             </button>

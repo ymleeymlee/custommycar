@@ -55,12 +55,9 @@ export default function Header({ profile }: HeaderProps) {
       {/* 메인 헤더 */}
       <div className="px-4 md:px-6 py-3 flex items-center justify-between gap-3">
         {/* 로고 */}
-        <Link href="/products" className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="bg-[#c41230] text-white font-black text-sm px-2.5 py-1.5 rounded-lg tracking-tight shadow-lg shadow-red-900/30">
-            CMC
-          </div>
-          <div className="hidden sm:block">
-            <div className="font-bold text-sm leading-tight tracking-tight text-white">CustomMyCar</div>
+        <Link href="/products" className="flex items-center gap-2.5 flex-shrink-0 group">
+          <div>
+            <div className="font-extrabold text-base leading-tight tracking-tight text-white group-hover:text-gray-200 transition-colors">CustomMyCar</div>
             <div className="text-[10px] text-gray-500 leading-tight tracking-wider uppercase">vollkommen Official Portal</div>
           </div>
         </Link>
@@ -79,13 +76,13 @@ export default function Header({ profile }: HeaderProps) {
 
         {/* 우측: 장바구니 + 햄버거 */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Link href="/cart" className="relative flex items-center gap-1.5 bg-[#c41230] hover:bg-[#a50e28] px-3 py-2 rounded-xl text-sm font-bold transition-all shadow-md shadow-red-900/30">
+          <Link href="/cart" className="relative flex items-center gap-1.5 bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-full text-sm font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <span className="hidden sm:inline">장바구니</span>
             {totalCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-yellow-400 text-[#1a2744] text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+              <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
                 {totalCount > 9 ? '9+' : totalCount}
               </span>
             )}

@@ -17,86 +17,73 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (authError) {
-      setError('이메일 또는 비밀번호가 올바르지 않습니다.')
-      setLoading(false)
-      return
-    }
-
-    if (data.user) {
-      router.push('/products')
-      router.refresh()
-    }
+    if (authError) { setError('이메일 또는 비밀번호가 올바르지 않습니다.'); setLoading(false); return }
+    if (data.user) { router.push('/products'); router.refresh() }
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f5f7] flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f1624] via-[#1a2744] to-[#0f1624] flex flex-col">
       {/* 헤더 */}
-      <div className="bg-[#1a2744] text-white px-6 py-3 flex items-center gap-3">
-        <div className="bg-[#c41230] text-white font-black text-lg px-3 py-1 rounded tracking-tight">CMC</div>
+      <div className="px-6 py-4 flex items-center gap-3">
         <div>
-          <div className="font-bold text-lg leading-tight">CustomMyCar</div>
-          <div className="text-xs text-gray-400">vollkommen 공식 거래처 포털</div>
+          <div className="font-extrabold text-white leading-tight text-lg">CustomMyCar</div>
+          <div className="text-xs text-gray-500 tracking-wider uppercase">vollkommen Official Portal</div>
         </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* 안내 배너 */}
-          <div className="bg-[#1a2744] text-white rounded-lg p-4 mb-6 text-sm">
-            <div className="font-semibold mb-1">거래처 전용 포털</div>
-            <div className="text-gray-300 text-xs">본 사이트는 vollkommen 공식 거래처에게만 공개된 비공개 구매 포털입니다. 가입 후 관리자 승인이 필요합니다.</div>
+          <div className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl p-4 mb-6 text-sm">
+            <div className="font-semibold text-white mb-1">거래처 전용 포털</div>
+            <div className="text-gray-400 text-xs leading-relaxed">본 사이트는 vollkommen 공식 거래처에게만 공개된 비공개 구매 포털입니다. 가입 후 관리자 승인이 필요합니다.</div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
-            <h1 className="text-xl font-bold text-gray-800 mb-6">로그인</h1>
+          <div className="bg-white rounded-2xl shadow-2xl shadow-black/40 p-8">
+            <h1 className="text-xl font-bold text-gray-900 mb-6">로그인</h1>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded px-3 py-2 mb-4">
+              <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-5">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 {error}
               </div>
             )}
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2744]"
-                  placeholder="company@email.com"
-                  required
-                />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">이메일</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2744]/30 focus:border-[#1a2744] transition-all bg-gray-50/50"
+                  placeholder="company@email.com" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2744]"
-                  placeholder="••••••••"
-                  required
-                />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">비밀번호</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2744]/30 focus:border-[#1a2744] transition-all bg-gray-50/50"
+                  placeholder="••••••••" required />
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#c41230] hover:bg-[#a50e28] disabled:bg-gray-300 text-white font-semibold py-2.5 rounded transition-colors text-sm"
-              >
-                {loading ? '로그인 중...' : '로그인'}
+              <button type="submit" disabled={loading}
+                className="btn-primary w-full disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none">
+                {loading ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    로그인 중...
+                  </>
+                ) : '로그인 →'}
               </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-gray-100 text-center text-sm text-gray-500">
               아직 계정이 없으신가요?{' '}
-              <Link href="/register" className="text-[#1a2744] font-semibold hover:underline">
-                거래처 가입 신청
+              <Link href="/register" className="text-[#1a2744] font-bold hover:text-[#c41230] transition-colors">
+                거래처 가입 신청 →
               </Link>
             </div>
           </div>

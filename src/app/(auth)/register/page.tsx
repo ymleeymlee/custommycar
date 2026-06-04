@@ -66,10 +66,9 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-[#f4f5f7] flex flex-col">
       <div className="bg-[#1a2744] text-white px-6 py-3 flex items-center gap-3">
-        <div className="bg-[#c41230] text-white font-black text-lg px-3 py-1 rounded tracking-tight">CMC</div>
         <div>
-          <div className="font-bold text-lg leading-tight">CustomMyCar</div>
-          <div className="text-xs text-gray-400">vollkommen 공식 거래처 포털</div>
+          <div className="font-extrabold text-lg leading-tight text-white">CustomMyCar</div>
+          <div className="text-xs text-gray-500 tracking-wider uppercase">vollkommen Official Portal</div>
         </div>
       </div>
 
@@ -156,9 +155,17 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#1a2744] hover:bg-[#243560] disabled:bg-gray-300 text-white font-semibold py-2.5 rounded transition-colors text-sm"
+                className="btn-primary w-full disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
               >
-                {loading ? '신청 중...' : '가입 신청'}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    신청 중...
+                  </span>
+                ) : '가입 신청'}
               </button>
             </form>
 
